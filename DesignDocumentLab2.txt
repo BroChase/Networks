@@ -1,0 +1,240 @@
+
+
+Chase Brown
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Software Design
+Specification
+
+Server Client Personal Calendar
+Revision 1.0
+
+
+Table of Contents
+Table of Contents	ii
+Revision History	iii
+1.	Introduction	1
+1.1	Purpose	1
+1.2	System Overview	1
+2.	Design Considerations	1
+2.1	Assumptions	1
+2.2	Constraints	1
+2.3	System Environment	1
+2.4	Risks and Volatile Areas	1
+3.	Architecture	2
+3.1	System Architecture	2
+3.2	Sever Components	3
+3.3	Client Components	4
+3.4	User Database	5
+3.5	Protocol Design	5
+
+
+Revision History
+VersionNameReason For ChangesDate1.0Chase BrownInitial Revision
+03/20/2018
+
+
+
+1. Introduction
+1.1 Purpose 
+Design an on-line personal calendar using TCP sockets and developed protocol.
+1.2 System Overview
+This project is intended to create an on-line personal calendar using TCP sockets and a custom protocol.  The calendar protocol shall be able to add a user, delete a user, modify user information, user authentications, add a new appointment, remove an appointment, update an existing appointment, display a user’s appointments for a specific time.
+2. Design Considerations
+All design considerations were handled in phase 1.
+
+2.1 Assumptions
+Use of all C++11 functionality
+2.2 Constraints
+All programs shall be written in C or C++ and run on UNIX like platform.
+2.3 System Environment
+Required to run on CSEgrid machines
+2.4 Risks and Volatile Areas
+* Check a time conflict(duplicated appointments)
+o Appointments can be made at the same time and date as long as they do not have the same name.  Modern calendar systems allow users to create events at the same time or overlapping.
+* Check duplicated users
+o During registration of a user if the user exists in the database an error is returned, and client is sent back to login/registration.
+* Check incomplete schedule
+o Schedule is forced to have all areas filled before it is sent to the server for storage.
+* Check invalid time and character.
+o Inputs are checked via regex strings and not passed until valid.  Regex is not supported by the CSEgrid GCC(4.8.2).  Regex strings require 4.9+ GCC.  Commented out.
+o Inputs are checked via functions and not passed until valid.
+3. Architecture
+The architecture provides the top-level design view of a system and provides a basis for more detailed design work
+
+Provide or reference a detailed description and diagrams of the architecture.
+
+3.1 System Architecture
+Server: TCP socket server to be ran on a node awaiting connections.
+
+Client: TCP socket client, able to run on multiple nodes connecting to a single server.
+
+3.2 Sever Components
+TCP Socket multi-threaded server written with C++
+Ability to listen for new connections and create threads to handle such connections.
+
+* Main.cpp
+o Main()
+* Server implementation/start
+* Connection threading
+o *connection_handler()
+* Handles all operations for thread created in main.
+* ClientSocket.h/cpp
+o ClientSocket class definition
+o Message struct definition
+o Enum message_type
+o Enum header_type
+* Fileops.h/cpp
+o Save_new_user()
+* Save 
+o Look_up_user()
+* Check if user exists.
+o Get_user_appointments()
+* Retrieve the current user appointments
+o Save_appointments()
+* Save user appointments
+o Load_appointments()
+* Load user appointments
+o Save_updated_appointments()
+* Save user updated appointments
+* Passwordfunctions.h/cpp
+o Random_string()
+* Generates a random string with length of user password
+o Decrypt()
+* Decrypt a string using XOR
+o Encrypt()
+* Encrypt a string using XOR
+* Users.h/cpp
+o Appointment class definition
+o User class definition
+o string_is_valid()
+* Validates string is alphanumeric
+o password_is_valid()
+* Validates password is alphanumeric and of length 8-16
+o phone_id_valid()
+* Validates phone is numeric and of length 10
+o check_valid_time()
+* Validate time format
+o check_valid_data()
+* Validate date format
+
+3.3 Client Components
+TCP Client written with C++
+Ability to connect to a server by a given IP.
+
+* Main.cpp
+o Accepts client IP argument
+o Connects to Server
+* ClientSocket.h/cpp
+o ClientSocket class definition
+o Message struct definition
+o Enum message_type
+o Enum header_type
+* Passwordfunctions.h/cpp
+o Random_string()
+* Generates a random string with length of user password
+o Decrypt()
+* Decrypt a string using XOR
+o Encrypt()
+* Encrypt a string using XOR
+* Users.h/cpp
+o Appointment class definition
+o User class definition
+o Create_user()
+* Creates new user, Name, Password, Phone, Email.
+o Edit_user()
+* Edit User info, Name, Password, Phone, Email.
+o New_appointment()
+* Creates appointment, start time, end time, start date, end date, place, details.
+o Ed_apps()
+* Edit current appointment
+o Del_apps()
+* Delete current appointment
+o Filter_apps()
+* Filter appointments for view
+o isValidDate()
+* Validates date
+o isValidTime()
+* Validates time
+o isValidTimeRange()
+* Validates time range.
+o string_is_valid()
+* Validates string is alphanumeric
+o password_is_valid()
+* Validates password is alphanumeric and of length 8-16
+o phone_id_valid()
+* Validates phone is numeric and of length 10
+o check_valid_time()
+* Validate time format
+o check_valid_data()
+* Validate date format
+3.4 User Database
+Simple directory ‘Users’ to hold .csv files for users and their appointments.
+* User Files:
+o One file per user with name format: ‘username’.csv
+* User Appointments Files:
+o One file per user with naming format: ‘username’appoint.csv
+3.5 Protocol Design
+Packets will be sent as a ‘message’
+Allows Client and Server to communicate as expected.
+* Message : Struct
+o Type: enumerated value
+* CONNECT_OK
+* TRACK
+* SUCCESS
+* FAILER
+* QUIT
+o Header: enumerated value
+* GET_USER
+* SEND_USER
+* GET_PASSWORD
+* SEND_PASSWORD
+* LOGIN
+* REGISTER
+* MENU
+* APPOINTMENTS
+* EDIT_USER
+* DELETE_USER
+* NEW_APPOINTMENT
+* VIEW_APPOINTMENT
+* MENU2
+* UPDATE_APPS
+* SAVE_UPDATE_APPS
+* GOOD
+o Payload: char[255]
+
+
+
+
+
+
+
+
+
+
+
+	
+Revision 1.0	Page 11	Chase Brown
+
+
+
